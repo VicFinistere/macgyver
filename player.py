@@ -24,22 +24,18 @@ class Player(pygame.sprite.Sprite):
     def moveup(self):
         if self.rect.y > 0:
             self.rect.y -= 25
-            self.check_score()
 
     def movedown(self):
         if self.rect.y + 50 < HEIGHT:
             self.rect.y += 25
-            self.check_score()
 
     def moveleft(self):
         if self.rect.x > 0:
             self.rect.x -= 25
-            self.check_score()
 
     def moveright(self):
         if self.rect.x + 50 < WIDTH:
             self.rect.x += 25
-            self.check_score()
 
     def check_score(self):
         return self.score

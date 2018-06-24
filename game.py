@@ -1,11 +1,13 @@
 import pygame
+import os
 from pygame.locals import *
+import pytmx
 from config import COLORS, SCREEN, WIDTH
 from player import Player
 from enemy import Enemy
 from item import Item
 from wall import Wall
-
+from config import ASSETS_DIR
 
 class Game:
     def __init__(self):
@@ -13,28 +15,40 @@ class Game:
         Creating the specific in game state
         """
         # Level
-        self.level_file = "level.txt";
-        with open(self.level_file, "r") as level:
-            self.walls = []
-            self.items = []
-            self.collide_ennemy = False
-            x = y = 0
+        level_file = os.path.join(ASSETS_DIR, "gfx/level.tmx")
+        level = pytmx.load_pygame(level_file)
+        self.walls = []
+        self.items = []
+        wall_tiles = 0
+        item_tiles = 1
+        enemy_tiles = 2
+        player_tiles = 3
 
-            for row in level:
-                for col in row:
-                    if col == "P":
-                        self.player = Player((x, y))
-                    elif col == "E":
-                        self.enemy = Enemy((x, y))
-                    elif col == "W":
-                        self.wall = Wall((x, y))
-                        self.walls.append(self.wall)
-                    elif col == "I":
-                        self.item = Item((x, y))
-                        self.items.append(self.item)
-                    x += 30
-                x = 0
-                y += 30
+        self.collide_enemy = False
+
+        for row in range(15):
+            for col in range(15):
+                # Walls in tmx file
+                wall = level.get_tile_image(row, col, wall_tiles)
+                if wall is not None:
+                    self.wall = Wall((row, col))
+                    self.walls.append(self.wall)
+
+                # Item in tmx file
+                item = level.get_tile_image(row, col, item_tiles)
+                if item is not None:
+                    self.item = Item((row, col))
+                    self.items.append(self.item)
+
+                # Enemy in tmx file
+                enemy = level.get_tile_image(row, col, enemy_tiles)
+                if enemy is not None:
+                    self.enemy = Enemy((row, col))
+
+                # Player in tmx file
+                player = level.get_tile_image(row, col, player_tiles)
+                if player is not None:
+                    self.player = Player((row, col))
 
         # Create a font
         self.font = pygame.font.Font(None, 24)
@@ -59,7 +73,7 @@ class Game:
         while self.run:
             for event in pygame.event.get():
 
-                if event.type == QUIT or self.collide_ennemy:
+                if event.type == QUIT or self.collide_enemy:
                     if int(self.player.score) > 1:
                         file = open('score.txt', 'w')
                         file.write(f"You got {self.player.score} points !")
@@ -95,7 +109,7 @@ class Game:
                                 self.player.moveright()
 
                     if self.player.rect.colliderect(self.enemy.rect):
-                        self.collide_ennemy = True
+                        self.collide_enemy = True
 
             for self.item in self.items:
                 if self.item.rect:
@@ -103,7 +117,7 @@ class Game:
                         self.player.scoring_up()
                         self.items.remove(self.item)
 
-            pygame.time.wait(200)
+            # pygame.time.wait(200)
             self.draw()
 
     def draw(self):
@@ -118,15 +132,15 @@ class Game:
         SCREEN.fill(COLORS["BLACK"])
 
         # Blit everything to the screen
-        SCREEN.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
-        SCREEN.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
-        SCREEN.blit(score, ((WIDTH - score_rect) - 20, 20))
         for self.wall in self.walls:
             SCREEN.blit(self.wall.image, (self.wall.rect.x, self.wall.rect.y))
 
         for self.item in self.items:
             if self.item.rect:
                 SCREEN.blit(self.item.image, (self.item.rect.x, self.item.rect.y))
+        SCREEN.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
+        SCREEN.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
+        SCREEN.blit(score, ((WIDTH - score_rect) - 20, 20))
         pygame.display.flip()
         pygame.display.flip()
         pygame.time.wait(200)

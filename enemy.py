@@ -12,4 +12,4 @@ class Enemy(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/enemy.png"))
         self.image = pygame.transform.scale(self.image, (32, 32))
-        self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
+        self.rect = pygame.Rect(pos[0]*32, pos[1]*32, 32, 32)

@@ -1,2 +1,3 @@
-pygame
-pygame=1.9
+pytmx
+pygame>=1.9
+

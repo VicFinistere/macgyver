@@ -8,34 +8,35 @@ class Player(pygame.sprite.Sprite):
     :returns  player
     """
 
-    def __init__(self):
+    def __init__(self, pos):
         """
         :rtype: object
         """
         pygame.sprite.Sprite.__init__(self)
 
         self.area = SCREEN.get_rect()
-        self.speed = 10
+        self.speed = 25
         self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/player.png"))
-        self.rect = self.image.get_rect()
+        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.score = "0"
         self.collecting = False
 
     def moveup(self):
         if self.rect.y > 0:
-            self.rect.y -= 25
+            self.rect.y -= self.speed
 
     def movedown(self):
-        if self.rect.y + 50 < HEIGHT:
-            self.rect.y += 25
+        if self.rect.y + self.speed*2 < HEIGHT:
+            self.rect.y += self.speed
 
     def moveleft(self):
         if self.rect.x > 0:
-            self.rect.x -= 25
+            self.rect.x -= self.speed
 
     def moveright(self):
-        if self.rect.x + 50 < WIDTH:
-            self.rect.x += 25
+        if self.rect.x + self.speed*2 < WIDTH:
+            self.rect.x += self.speed
 
     def check_score(self):
         return self.score

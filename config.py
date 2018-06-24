@@ -6,7 +6,6 @@ ASSETS_DIR = os.path.join(GAME_DIR, "assets")
 TITLE = 'Mac Gyver'
 WIDTH = 480
 HEIGHT = 480
-ENEMY_POS= (200, 200)
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 score = open('score.txt', 'w')
 COLORS = {

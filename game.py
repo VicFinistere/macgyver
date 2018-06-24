@@ -99,7 +99,6 @@ class Game:
 
                 # down
                 elif keys[K_DOWN]:
-                    print("key is pressing")
                     self.player.movedown()
                     for self.wall in self.walls:
                         if self.player.rect.colliderect(self.wall.rect):

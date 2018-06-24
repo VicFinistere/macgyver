@@ -1,31 +1,35 @@
 import pygame
+import os
 from pygame.locals import *
 
-from config import COLORS, SCREEN, WIDTH, HEIGHT
+from config import ASSETS_DIR, COLORS, SCREEN, WIDTH, HEIGHT
 
 class End:
     def __init__(self):
-        # Create a font
-        self.font = pygame.font.Font(None, 24)
+
+        # Text fonts
+        font = pygame.font.Font(None, 48)
+        inst_font = pygame.font.Font(None, 24)
 
         # Texts
-        self.text_content = "The end"
-        self.inst_content = "(Click again to quit)"
+        text_content = "The end"
+        inst_content = "(Click again to quit)"
+
+        # Score from file
+        score_file = open("score.txt", "r")
+        score_content = score_file.read()
+        score_file.close()
 
         # Pygame Texts Elements
-        self.inst = self.font.render(self.inst_content, 1, (COLORS["WHITE"]))
-        self.inst_rect = (self.font.size(self.inst_content))[0]
-        self.text = self.font.render(self.text_content, 1, (COLORS["WHITE"]))
-        self.text_rect = (self.font.size(self.text_content))[0]
+        self.inst = inst_font.render(inst_content, 1, (COLORS["WHITE"]))
+        self.inst_rect = (inst_font.size(inst_content))[0]
+        self.text = font.render(text_content, 1, (COLORS["WHITE"]))
+        self.text_rect = (font.size(text_content))[0]
 
-        # Get the score from file
-        self.score_file = open("score.txt", "r")
-        self.score_content = self.score_file.read()
-        self.score_file.close()
 
         # Victory Message
-        self.score = self.font.render(self.score_content, 1, (COLORS["WHITE"]))
-        self.score_rect = (self.font.size(self.score_content))[0]
+        self.score = inst_font.render(score_content, 1, (COLORS["WHITE"]))
+        self.score_rect = (inst_font.size(score_content))[0]
 
         # Launching
         self.run = True
@@ -47,7 +51,8 @@ class End:
         Fill background and blit everything to the screen
         """
         # Fill background
-        SCREEN.fill(COLORS["BLACK"])
+        background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/splashscreen.png"))
+        SCREEN.blit(background, (0, 0))
 
         # VICTORY CASE
         SCREEN.blit(self.score, ((WIDTH / 2) - (self.score_rect / 2), HEIGHT - 20))

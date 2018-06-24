@@ -53,6 +53,10 @@ class Game:
         # Create a font
         self.font = pygame.font.Font(None, 24)
 
+        # Sounds
+        self.sound_point = pygame.mixer.Sound(os.path.join(ASSETS_DIR, "sfx/point.flac"))
+        self.sound_win = pygame.mixer.Sound(os.path.join(ASSETS_DIR, "sfx/win.ogg"))
+        self.sound_fail = pygame.mixer.Sound(os.path.join(ASSETS_DIR, "sfx/fail.wav"))
         # Launching
         self.run = True
         self.draw()
@@ -75,49 +79,60 @@ class Game:
 
                 if event.type == QUIT or self.collide_enemy:
                     if int(self.player.score) > 1:
+                        self.sound_win.play()
                         file = open('score.txt', 'w')
                         file.write(f"You got {self.player.score} points !")
                         file.close()
+                    else:
+                        self.sound_fail.play()
                     self.run = False
 
                 # Pressing a key
-                if event.type == KEYDOWN:
 
-                    # up
-                    if event.key == K_UP:
-                        self.player.moveup()
-                        for self.wall in self.walls:
-                            if self.player.rect.colliderect(self.wall.rect):
-                                self.player.movedown()
-                    # down
-                    if event.key == K_DOWN:
-                        self.player.movedown()
-                        for self.wall in self.walls:
-                            if self.player.rect.colliderect(self.wall.rect):
-                                self.player.moveup()
-                    # right
-                    if event.key == K_RIGHT:
-                        self.player.moveright()
-                        for self.wall in self.walls:
-                            if self.player.rect.colliderect(self.wall.rect):
-                                self.player.moveleft()
-                    # left
-                    if event.key == K_LEFT:
-                        self.player.moveleft()
-                        for self.wall in self.walls:
-                            if self.player.rect.colliderect(self.wall.rect):
-                                self.player.moveright()
+                keys = pygame.key.get_pressed()
+                # up
+                if keys[K_UP]:
+                    self.player.moveup()
+                    for self.wall in self.walls:
+                        if self.player.rect.colliderect(self.wall.rect):
+                            self.player.movedown()
 
-                    if self.player.rect.colliderect(self.enemy.rect):
-                        self.collide_enemy = True
+                # down
+                elif keys[K_DOWN]:
+                    print("key is pressing")
+                    self.player.movedown()
+                    for self.wall in self.walls:
+                        if self.player.rect.colliderect(self.wall.rect):
+                            self.player.moveup()
+
+
+                # right
+                elif keys[K_RIGHT]:
+                    self.player.moveright()
+                    for self.wall in self.walls:
+                        if self.player.rect.colliderect(self.wall.rect):
+                            self.player.moveleft()
+
+
+                # left
+                elif keys[K_LEFT]:
+                    self.player.moveleft()
+                    for self.wall in self.walls:
+                        if self.player.rect.colliderect(self.wall.rect):
+                            self.player.moveright()
+
+
+                if self.player.rect.colliderect(self.enemy.rect):
+                    self.collide_enemy = True
 
             for self.item in self.items:
                 if self.item.rect:
                     if self.player.rect.colliderect(self.item.rect):
+                        self.sound_point.play()
                         self.player.scoring_up()
                         self.items.remove(self.item)
 
-            # pygame.time.wait(200)
+            pygame.time.wait(50)
             self.draw()
 
     def draw(self):
@@ -129,7 +144,8 @@ class Game:
         score_rect = (self.font.size(score_value))[0]
 
         # Fill background
-        SCREEN.fill(COLORS["BLACK"])
+        background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/background.png"))
+        SCREEN.blit(background, (0, 0))
 
         # Blit everything to the screen
         for self.wall in self.walls:
@@ -143,5 +159,4 @@ class Game:
         SCREEN.blit(score, ((WIDTH - score_rect) - 20, 20))
         pygame.display.flip()
         pygame.display.flip()
-        pygame.time.wait(200)
         self.update()

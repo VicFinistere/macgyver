@@ -1,8 +1,8 @@
 import pygame
 import os
 from pygame.locals import *
+from music import Music
 from config import SCREEN, ASSETS_DIR, COLORS, HEIGHT, WIDTH
-
 
 class Intro:
     """
@@ -17,6 +17,12 @@ class Intro:
         # Texts
         text_content = "Mac Gyver Maze"
         inst_content = "( Press a key or click to play)"
+
+        # Music
+        self.music = Music()
+
+        # Background
+        self.background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/splashscreen.png"))
 
         # Title element
         self.title = font.render(text_content, 1, (COLORS["WHITE"]))
@@ -51,8 +57,8 @@ class Intro:
         Fill background and blit everything to the screen
         """
         # Fill background
-        background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/splashscreen.png"))
-        SCREEN.blit(background, (0, 0))
+        SCREEN.blit(self.background, (0, 0))
+
         # Blit everything to the screen
         SCREEN.blit(self.title, ((WIDTH - self.title_rect)/2, HEIGHT / 2))
         SCREEN.blit(self.inst, ((WIDTH - self.title_rect)/2, HEIGHT - 50))

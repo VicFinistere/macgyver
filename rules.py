@@ -22,7 +22,7 @@ class Rules:
         text_content = "Mac Gyver Maze"
         inst_content1 = "Use arrows to move around mazes "
         inst_content2 = "collect Swiss knives before facing the enemy."
-        inst_content3 = " Wish you will able to 'MacGyver your way out '  !! "
+        inst_content3 = " Wish you will be able to 'MacGyver your way out '  !! "
         inst_content4 = "  P = Pause the game / S = Stop the music"
 
         # Sound
@@ -37,14 +37,14 @@ class Rules:
         self.arrows_rect = self.arrows.get_rect()
 
         # Title element
-        self.title = font.render(text_content, 1, (COLORS["WHITE"]))
+        self.title = font.render(text_content, 1, (COLORS["BLACK"]))
         self.title_rect = (font.size(text_content))[0]
 
         # Instructions element
-        self.inst1 = inst_font.render(inst_content1, 1, (COLORS["WHITE"]))
-        self.inst2 = inst_font.render(inst_content2, 1, (COLORS["WHITE"]))
-        self.inst3 = inst_font.render(inst_content3, 1, (COLORS["WHITE"]))
-        self.inst4 = inst_font.render(inst_content4, 1, (COLORS["WHITE"]))
+        self.inst1 = inst_font.render(inst_content1, 1, (COLORS["BLACK"]))
+        self.inst2 = inst_font.render(inst_content2, 1, (COLORS["BLACK"]))
+        self.inst3 = inst_font.render(inst_content3, 1, (COLORS["BLACK"]))
+        self.inst4 = inst_font.render(inst_content4, 1, (COLORS["BLACK"]))
 
         self.inst_rect1 = (inst_font.size(inst_content1))[0]
         self.inst_rect2 = (inst_font.size(inst_content2))[0]

@@ -2,12 +2,14 @@ import pygame
 import os
 from pygame.locals import *
 from music import Music
-from config import SCREEN, ASSETS_DIR, COLORS, HEIGHT, WIDTH
+from config import SCREEN, ASSETS_DIR, COLORS, SCREEN_H, SCREEN_W
+
 
 class Intro:
     """
     Introduction Scene
     """
+
     def __init__(self):
 
         # Text fonts
@@ -34,7 +36,7 @@ class Intro:
 
         # Launching
         self.run = True
-        self.state = 0
+        self.status = 0
         self.draw()
 
     def update(self):
@@ -44,13 +46,13 @@ class Intro:
         while self.run:
             for event in pygame.event.get():
                 if event.type == MOUSEBUTTONDOWN or event.type == KEYDOWN:
-                    self.state = 1
+                    self.status = 1
                     self.run = False
                 elif event.type == QUIT:
                     self.run = False
             pygame.time.wait(500)
             self.draw()
-        return self.state
+        return self.status
 
     def draw(self):
         """
@@ -60,8 +62,8 @@ class Intro:
         SCREEN.blit(self.background, (0, 0))
 
         # Blit everything to the screen
-        SCREEN.blit(self.title, ((WIDTH - self.title_rect)/2, HEIGHT / 2))
-        SCREEN.blit(self.inst, ((WIDTH - self.title_rect)/2, HEIGHT - 50))
+        SCREEN.blit(self.title, ((SCREEN_W - self.title_rect) / 2, SCREEN_H / 2))
+        SCREEN.blit(self.inst, ((SCREEN_W - self.title_rect) / 2, SCREEN_H - 50))
         pygame.display.flip()
         pygame.time.wait(500)
         self.update()

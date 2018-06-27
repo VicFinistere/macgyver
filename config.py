@@ -4,9 +4,9 @@ os.environ["SDL_VIDEO_CENTERED"] = "1"
 GAME_DIR = os.path.dirname(__file__)
 ASSETS_DIR = os.path.join(GAME_DIR, "assets")
 TITLE = 'Mac Gyver'
-WIDTH = 480
-HEIGHT = 480
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+SCREEN_W = 480
+SCREEN_H = 480
+SCREEN = pygame.display.set_mode((SCREEN_W, SCREEN_H))
 score = open('score.txt', 'w')
 COLORS = {
     "BLACK": (0, 0, 0),

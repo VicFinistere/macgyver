@@ -1,6 +1,7 @@
 import pygame
 import os
-from config import ASSETS_DIR, SCREEN, WIDTH, HEIGHT
+from config import ASSETS_DIR, SCREEN, SCREEN_W, SCREEN_H
+
 
 class Player(pygame.sprite.Sprite):
     """
@@ -15,10 +16,10 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.area = SCREEN.get_rect()
-        self.speed = 16
+        self.speed = 32
         self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/player.png"))
         self.image = pygame.transform.scale(self.image, (32, 32))
-        self.rect = pygame.Rect(pos[0]*32, pos[1]*32, 32, 32)
+        self.rect = pygame.Rect(pos[0] * 32, pos[1] * 32, 32, 32)
         self.score = "0"
         self.collecting = False
 
@@ -27,7 +28,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.y -= self.speed
 
     def movedown(self):
-        if self.rect.y + self.speed*2 < HEIGHT:
+        if self.rect.y + self.speed * 2 < SCREEN_H:
             self.rect.y += self.speed
 
     def moveleft(self):
@@ -35,11 +36,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= self.speed
 
     def moveright(self):
-        if self.rect.x + self.speed*2 < WIDTH:
+        if self.rect.x + self.speed * 2 < SCREEN_W:
             self.rect.x += self.speed
-
-    def check_score(self):
-        return self.score
 
     def scoring_up(self):
         self.score = int(self.score)

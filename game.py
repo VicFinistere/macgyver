@@ -1,5 +1,8 @@
-import pygame
+"""
+Game Scene : This is where all the game logic is made
+"""
 import os
+import pygame
 from pygame.locals import *
 import pytmx
 from config import COLORS, SCREEN, SCREEN_W, SCREEN_H
@@ -10,10 +13,11 @@ from item import Item
 from wall import Wall
 from config import ASSETS_DIR
 
+
 class Game:
     def __init__(self, level_id, music_status):
         """
-        Creating the specific in game state
+        Game Scene
         """
         # Music
         self.music_status = music_status
@@ -39,7 +43,7 @@ class Game:
         # Level
         self.level_id = level_id
         self.final_level = 3
-        level_file = os.path.join(ASSETS_DIR, "gfx", "level"+str(level_id)+".tmx")
+        level_file = os.path.join(ASSETS_DIR, "gfx", "level" + str(level_id) + ".tmx")
         level = pytmx.load_pygame(level_file)
         self.walls = []
         self.items = []
@@ -86,7 +90,7 @@ class Game:
         self.sound_point = pygame.mixer.Sound(os.path.join(ASSETS_DIR, "sfx/point.flac"))
         self.sound_win = pygame.mixer.Sound(os.path.join(ASSETS_DIR, "sfx/win.ogg"))
         self.sound_fail = pygame.mixer.Sound(os.path.join(ASSETS_DIR, "sfx/fail.wav"))
-        self.sound_rect_x, self.sound_rect_y =  SCREEN_W-35, SCREEN_H-35
+        self.sound_rect_x, self.sound_rect_y = SCREEN_W - 35, SCREEN_H - 35
 
         # Launching
         self.run = True
@@ -115,7 +119,7 @@ class Game:
                     if int(self.player.score) > 1 and self.items_in_level == 0 and self.level_id != self.final_level:
                         self.sound_win.play()
                         file = open('score.txt', 'w')
-                        file.write(f"You got {self.player.score} points !")
+                        file.write(f"The game ends here for you, at the level {self.level_id+1} !")
                         file.close()
                         self.status = 1
                         self.run = False
@@ -160,7 +164,6 @@ class Game:
                         self.music_status = "on"
                         self.music.play()
 
-
                         # Pause text : off
                         if keys[K_p]:
                             self.pause = False
@@ -168,33 +171,37 @@ class Game:
                 # up
                 if not self.pause:
                     if keys[K_UP]:
-                        self.player.moveup()
-                        for self.wall in self.walls:
-                            if self.player.rect.colliderect(self.wall.rect):
-                                self.player.movedown()
+                        if self.player.rect.y > 0:
+                            self.player.move_up()
+                            for self.wall in self.walls:
+                                if self.player.rect.colliderect(self.wall.rect):
+                                    self.player.move_down()
 
                     # down
                     elif keys[K_DOWN]:
-                        self.player.movedown()
-                        for self.wall in self.walls:
-                            if self.player.rect.colliderect(self.wall.rect):
-                                self.player.moveup()
+                        if self.player.rect.y + self.player.speed * 2 < SCREEN_H:
+                            self.player.move_down()
+                            for self.wall in self.walls:
+                                if self.player.rect.colliderect(self.wall.rect):
+                                    self.player.move_up()
 
 
                     # right
                     elif keys[K_RIGHT]:
-                        self.player.moveright()
-                        for self.wall in self.walls:
-                            if self.player.rect.colliderect(self.wall.rect):
-                                self.player.moveleft()
+                        if self.player.rect.x + self.player.speed * 2 < SCREEN_W:
+                            self.player.move_right()
+                            for self.wall in self.walls:
+                                if self.player.rect.colliderect(self.wall.rect):
+                                    self.player.move_left()
 
 
                     # left
                     elif keys[K_LEFT]:
-                        self.player.moveleft()
-                        for self.wall in self.walls:
-                            if self.player.rect.colliderect(self.wall.rect):
-                                self.player.moveright()
+                        if self.player.rect.x > 0:
+                            self.player.move_left()
+                            for self.wall in self.walls:
+                                if self.player.rect.colliderect(self.wall.rect):
+                                    self.player.move_right()
 
                 # Collide with enemy
                 if self.player.rect.colliderect(self.enemy.rect):
@@ -238,9 +245,9 @@ class Game:
         SCREEN.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
         SCREEN.blit(score, ((SCREEN_W - score_rect) - 20, 20))
         if self.music.is_playing:
-            SCREEN.blit(self.music.play_img, (SCREEN_W-35, SCREEN_H-35))
+            SCREEN.blit(self.music.play_img, (SCREEN_W - 35, SCREEN_H - 35))
         else:
-            SCREEN.blit(self.music.stop_img, (SCREEN_W-35, SCREEN_H-35))
+            SCREEN.blit(self.music.stop_img, (SCREEN_W - 35, SCREEN_H - 35))
         pygame.display.flip()
         pygame.display.flip()
         self.update()

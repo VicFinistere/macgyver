@@ -1,3 +1,6 @@
+"""
+This class is made to construct walls for our maze
+"""
 import pygame
 import os
 from config import ASSETS_DIR
@@ -5,9 +8,8 @@ from config import ASSETS_DIR
 
 class Wall(pygame.sprite.Sprite):
     """
-        This class is handling properties and methods for enemies
-        :returns  any enemy
-        """
+    Wall Class
+    """
 
     def __init__(self, pos):
         pygame.sprite.Sprite.__init__(self)

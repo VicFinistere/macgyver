@@ -1,5 +1,8 @@
-import pygame
+"""
+This is the first scene, made for the splash screen
+"""
 import os
+import pygame
 from pygame.locals import *
 from music import Music
 from config import SCREEN, ASSETS_DIR, COLORS, SCREEN_H, SCREEN_W

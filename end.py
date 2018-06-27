@@ -1,11 +1,17 @@
-import pygame
+"""
+The end scene handles game over / victory message
+"""
 import os
+import pygame
 from pygame.locals import *
 
 from config import ASSETS_DIR, COLORS, SCREEN, SCREEN_W, SCREEN_H
 
 
 class End:
+    """
+    End Scene
+    """
     def __init__(self):
 
         # Text fonts
@@ -55,10 +61,8 @@ class End:
                         self.run = False
                         return self.status
 
-
             pygame.time.wait(500)
             self.draw()
-
 
     def draw(self):
         """
@@ -68,8 +72,8 @@ class End:
         background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/splashscreen.png"))
         SCREEN.blit(background, (0, 0))
 
-        # VICTORY CASE
-        SCREEN.blit(self.score, ((SCREEN_W / 2) - (self.score_rect / 2), SCREEN_H - 20))
+        # End Text
+        SCREEN.blit(self.score, ((SCREEN_W / 2) - (self.score_rect / 2), 300))
 
         # Blit everything to the screen
         SCREEN.blit(self.text, ((SCREEN_W / 2) - (self.text_rect / 2), SCREEN_H / 2))

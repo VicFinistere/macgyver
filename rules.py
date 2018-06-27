@@ -1,3 +1,6 @@
+"""
+This is the scene where you can figure out how to play with instructions texts and keyboard arrows image
+"""
 import pygame as pg
 import os
 from pygame.locals import *

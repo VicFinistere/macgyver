@@ -1,5 +1,5 @@
-import pygame
 import os
+import pygame
 from config import ASSETS_DIR, SCREEN, SCREEN_W, SCREEN_H
 
 
@@ -23,21 +23,17 @@ class Player(pygame.sprite.Sprite):
         self.score = "0"
         self.collecting = False
 
-    def moveup(self):
-        if self.rect.y > 0:
-            self.rect.y -= self.speed
+    def move_up(self):
+        self.rect.y -= self.speed
 
-    def movedown(self):
-        if self.rect.y + self.speed * 2 < SCREEN_H:
-            self.rect.y += self.speed
+    def move_down(self):
+        self.rect.y += self.speed
 
-    def moveleft(self):
-        if self.rect.x > 0:
-            self.rect.x -= self.speed
+    def move_left(self):
+        self.rect.x -= self.speed
 
-    def moveright(self):
-        if self.rect.x + self.speed * 2 < SCREEN_W:
-            self.rect.x += self.speed
+    def move_right(self):
+        self.rect.x += self.speed
 
     def scoring_up(self):
         self.score = int(self.score)

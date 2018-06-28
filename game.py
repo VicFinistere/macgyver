@@ -12,20 +12,17 @@ from enemy import Enemy
 from item import Item
 from wall import Wall
 from config import ASSETS_DIR
+from random import randint
 
 
 class Game:
-    def __init__(self, level_id, music_status):
+    def __init__(self):
         """
         Game Scene
         """
         # Music
-        self.music_status = music_status
-        if music_status == "on":
-            self.music = Music(music_status)
-            self.music.play()
-        else:
-            self.music = Music("off")
+        self.music = Music()
+        self.music.play()
 
         # Pause
         self.pause = False
@@ -41,16 +38,16 @@ class Game:
         self.text_rect = (font.size(pause_content))[0]
 
         # Level
-        self.level_id = level_id
-        self.final_level = 3
-        level_file = os.path.join(ASSETS_DIR, "gfx", "level" + str(level_id) + ".tmx")
+        level_file = os.path.join(ASSETS_DIR, "gfx", "level.tmx")
         level = pytmx.load_pygame(level_file)
         self.walls = []
         self.items = []
         wall_tiles = 0
-        item_tiles = 1
         enemy_tiles = 2
         player_tiles = 3
+
+        # We just want 4 items by level
+        self.items_in_level = 10
 
         self.collide_enemy = False
 
@@ -62,12 +59,6 @@ class Game:
                     self.wall = Wall((row, col))
                     self.walls.append(self.wall)
 
-                # Item in tmx file
-                item = level.get_tile_image(row, col, item_tiles)
-                if item is not None:
-                    self.item = Item((row, col))
-                    self.items.append(self.item)
-
                 # Enemy in tmx file
                 enemy = level.get_tile_image(row, col, enemy_tiles)
                 if enemy is not None:
@@ -78,10 +69,9 @@ class Game:
                 if player is not None:
                     self.player = Player((row, col))
 
-        # Items Counts
-        self.items_in_level = 0
-        for self.item in self.items:
-            self.items_in_level += 1
+        for i in range(self.items_in_level):
+            self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)))
+            self.items.append(self.item)
 
         # Create a font
         self.font = pygame.font.Font(None, 24)
@@ -96,6 +86,34 @@ class Game:
         self.run = True
         self.status = 0
         self.draw()
+
+    def remake_item(self):
+        """
+        Remake an item when collide to a wall, enemy or player rect
+        """
+        self.items.remove(self.item)
+        self.items_in_level -= 1
+        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)))
+        self.items.append(self.item)
+        self.items_in_level += 1
+
+    def test_item(self):
+        """
+        Test of the random generation ( goal :  be able to catch it )
+        """
+        # Test items generation with walls
+        for self.item in self.items:
+            for self.wall in self.walls:
+                if self.item.rect.colliderect(self.wall.rect):
+                    self.remake_item()
+
+            # Test item generation with enemy
+            if self.item.rect.colliderect(self.enemy.rect):
+                self.remake_item()
+
+            # Test item generation with player
+            if self.item.rect.colliderect(self.player.rect):
+                self.remake_item()
 
     def scoring(self):
         """
@@ -114,34 +132,37 @@ class Game:
 
             for event in pygame.event.get():
 
-                if event.type == QUIT or self.collide_enemy:
+                if self.collide_enemy:
 
-                    if int(self.player.score) > 1 and self.items_in_level == 0 and self.level_id != self.final_level:
+                    if self.items_in_level == 0:
                         self.sound_win.play()
                         file = open('score.txt', 'w')
-                        file.write(f"The game ends here for you, at the level {self.level_id+1} !")
-                        file.close()
-                        self.status = 1
-                        self.run = False
-                        return self.status, self.music_status
-
-                    elif int(self.player.score) > 1 and self.items_in_level == 0 and self.level_id == self.final_level:
-                        self.sound_win.play()
-                        file = open('score.txt', 'w')
-                        file.write(f"You finish the game ! Victory !")
+                        file.write(f"Victory ! You got all {self.player.score} Swiss Army Knife !")
                         file.close()
                         self.status = 0
-                        self.music.fadeout()
                         self.run = False
                         return self.status
 
                     else:
                         self.sound_fail.play()
+                        file = open('score.txt', 'w')
+                        file.write("GAME OVER !!")
+                        file.close()
                         self.music.fadeout()
+                        self.status = 0
+                        self.run = False
+                        return self.status
+
+                if event.type == QUIT:
+                    self.sound_fail.play()
+                    file = open('score.txt', 'w')
+                    file.write("You close before facing your enemy! Game Over...")
+                    file.close()
+                    self.music.fadeout()
                     self.status = 0
                     self.run = False
-                    return self.status, self.music_status
-                # Pressing a key
+                    return self.status
+                    # Pressing a key
 
                 keys = pygame.key.get_pressed()
 
@@ -151,7 +172,6 @@ class Game:
                     # Pause the music ( playing by default )
                     if self.music.is_playing:
                         self.music.is_playing = False
-                        self.music_status = "off"
                         self.music.pause()
 
                         # Pause text : on
@@ -161,8 +181,7 @@ class Game:
                     # Restart the music ( Stop the pause )
                     elif not self.music.is_playing:
                         self.music.is_playing = True
-                        self.music_status = "on"
-                        self.music.play()
+                        self.music.unpause()
 
                         # Pause text : off
                         if keys[K_p]:
@@ -209,7 +228,8 @@ class Game:
 
             # Collect items
             for self.item in self.items:
-                if self.item.rect:
+                keys = pygame.key.get_pressed()
+                if keys[K_UP] or keys[K_DOWN] or keys[K_LEFT] or keys[K_RIGHT]:
                     if self.player.rect.colliderect(self.item.rect):
                         self.items_in_level -= 1
                         self.sound_point.play()
@@ -223,6 +243,9 @@ class Game:
         """
         Fill background and blit everything to the screen
         """
+        # Item test position
+        self.test_item()
+
         score_value = self.scoring()
         score = self.font.render(score_value, 1, (COLORS["WHITE"]))
         score_rect = (self.font.size(score_value))[0]
@@ -232,6 +255,8 @@ class Game:
         SCREEN.blit(background, (0, 0))
 
         # Blit everything to the screen
+        SCREEN.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
+        SCREEN.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
         if self.pause:
             SCREEN.blit(self.text, ((SCREEN_W / 2) - (self.text_rect / 2), SCREEN_H / 2))
 
@@ -241,8 +266,6 @@ class Game:
         for self.item in self.items:
             if self.item.rect:
                 SCREEN.blit(self.item.image, (self.item.rect.x, self.item.rect.y))
-        SCREEN.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
-        SCREEN.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
         SCREEN.blit(score, ((SCREEN_W - score_rect) - 20, 20))
         if self.music.is_playing:
             SCREEN.blit(self.music.play_img, (SCREEN_W - 35, SCREEN_H - 35))
@@ -250,4 +273,5 @@ class Game:
             SCREEN.blit(self.music.stop_img, (SCREEN_W - 35, SCREEN_H - 35))
         pygame.display.flip()
         pygame.display.flip()
+        pygame.time.wait(50)
         self.update()

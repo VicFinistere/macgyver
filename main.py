@@ -47,7 +47,7 @@ def rules(status):
     return status
 
 
-def levels(status, level_id, music_status):
+def levels(status):
     """
     Game Levels
     :param status: (bool) Ready to capture User Event
@@ -55,10 +55,10 @@ def levels(status, level_id, music_status):
     :param music_status: (str) An str working like a bool for music handling between levels
     :return: Updated Status Param + Music Status ( on / off )
     """
-    current = Game(level_id, music_status)
+    current = Game()
     if current.status:
         status = current.status
-    return status, current.music_status
+    return status
 
 
 def end(status):
@@ -86,25 +86,20 @@ while run:
 
         # if rules scene returns true => game : level 1
         if play == 1:
+            play = levels(0)
 
-            #  Play with  music preferences ( "on" by default, only for the first time )
-            play, music_status = levels(0, 1, "on")
+            # Only one level
+            if play == 0:
+                play = end(0)
 
-            # Level one returns true => Check for the others
-            if play == 1:
-                for level_id in range(2, 4):
+                # Restart( User Event )
+                if play == 1:
+                    run = True
 
-                    # Current level returns true : Play another one
-                    if play == 1:
-                        play, music_status = levels(0, level_id, music_status)
+                # Quit ( Close )
+                else:
+                    run = False
 
-                        # Quit
-                        if play == 0:
-                            state_id = End()
-                            run = False
-
-            else:
-                run = False
         else:
             run = False
     else:

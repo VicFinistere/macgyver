@@ -21,7 +21,7 @@ class Rules:
         # Texts
         text_content = "Mac Gyver Maze"
         inst_content1 = "Use arrows to move around mazes "
-        inst_content2 = "collect Swiss knives before facing the enemy."
+        inst_content2 = "collect all 3 items before facing the enemy."
         inst_content3 = " Wish you will be able to 'MacGyver your way out '  !! "
         inst_content4 = "  P = Pause the game / S = Stop the music"
 

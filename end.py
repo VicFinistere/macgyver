@@ -54,12 +54,10 @@ class End:
                     return self.status
 
                 elif event.type == MOUSEBUTTONDOWN or event.type == KEYDOWN:
-                    keys = pygame.key.get_pressed()
 
-                    if keys[K_r]:
-                        self.status = 1
-                        self.run = False
-                        return self.status
+                    self.status = 1
+                    self.run = False
+                    return self.status
 
             pygame.time.wait(500)
             self.draw()

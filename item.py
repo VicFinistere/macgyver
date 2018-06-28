@@ -13,13 +13,12 @@ class Item(pygame.sprite.Sprite):
     :returns  any player without specialities
     """
 
-    def __init__(self, pos):
+    def __init__(self, pos, kind):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/item.png"))
-        self.image = pygame.transform.scale(self.image, (32, 32))
-
-        # Here we want Mac Gyver to be able to catch the item from a small distance ( normal rect.(x/y): 32)
-        self.rect = pygame.Rect(pos[0] * 32, pos[1] * 32, 64, 64)
+        self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx", kind+".png"))
+        self.kind = kind
+        # self.image = pygame.transform.scale(self.image, (30, 30))
+        self.rect = pygame.Rect(pos[0], pos[1], 30, 30)
         random_orientation = randint(0, 3)
         if random_orientation == 0:
             self.image = pygame.transform.rotate(self.image, 90)

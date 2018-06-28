@@ -28,6 +28,7 @@ class Music:
         Stop the music ( easier to read in code )
         """
         pygame.mixer.music.stop()
+        self.is_playing = False
 
     def fadeout(self):
         """
@@ -40,9 +41,11 @@ class Music:
         Pause the music(easier to read in code )
         """
         pygame.mixer.music.pause()
+        self.is_playing = False
 
     def unpause(self):
         """
         Stop the music pause ( easier to read in code )
         """
         pygame.mixer.music.unpause()
+        self.is_playing = True

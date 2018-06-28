@@ -47,7 +47,7 @@ class Game:
         player_tiles = 3
 
         # We just want 4 items by level
-        self.items_in_level = 10
+        self.items_in_level = 3
 
         self.collide_enemy = False
 
@@ -69,9 +69,29 @@ class Game:
                 if player is not None:
                     self.player = Player((row, col))
 
-        for i in range(self.items_in_level):
-            self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)))
-            self.items.append(self.item)
+        # Ether item
+        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), "ether")
+        self.items.append(self.item)
+
+        # Needle item
+        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), "needle")
+        self.items.append(self.item)
+
+        # Pipe
+        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), "pipe")
+        self.items.append(self.item)
+
+        # XL image when player catch sprite
+        self.ether_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/ether_xl.png"))
+        self.needle_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/needle_xl.png"))
+        self.pipe_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/pipe_xl.png"))
+
+        # XL rect for centering display
+        self.ether_xl_rect = self.ether_xl_image.get_rect()
+        self.needle_xl_rect = self.needle_xl_image.get_rect()
+        self.pipe_xl_rect = self.pipe_xl_image.get_rect()
+
+        self.draw_item = False
 
         # Create a font
         self.font = pygame.font.Font(None, 24)
@@ -87,13 +107,13 @@ class Game:
         self.status = 0
         self.draw()
 
-    def remake_item(self):
+    def remake_item(self, kind):
         """
         Remake an item when collide to a wall, enemy or player rect
         """
         self.items.remove(self.item)
         self.items_in_level -= 1
-        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)))
+        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), kind)
         self.items.append(self.item)
         self.items_in_level += 1
 
@@ -105,15 +125,15 @@ class Game:
         for self.item in self.items:
             for self.wall in self.walls:
                 if self.item.rect.colliderect(self.wall.rect):
-                    self.remake_item()
+                    self.remake_item(self.item.kind)
 
             # Test item generation with enemy
             if self.item.rect.colliderect(self.enemy.rect):
-                self.remake_item()
+                self.remake_item(self.item.kind)
 
             # Test item generation with player
             if self.item.rect.colliderect(self.player.rect):
-                self.remake_item()
+                self.remake_item(self.item.kind)
 
     def scoring(self):
         """
@@ -137,7 +157,7 @@ class Game:
                     if self.items_in_level == 0:
                         self.sound_win.play()
                         file = open('score.txt', 'w')
-                        file.write(f"Victory ! You got all {self.player.score} Swiss Army Knife !")
+                        file.write(f"Victory ! You made the guard falling asleep !")
                         file.close()
                         self.status = 0
                         self.run = False
@@ -227,14 +247,22 @@ class Game:
                     self.collide_enemy = True
 
             # Collect items
+            self.draw_item = False
             for self.item in self.items:
                 keys = pygame.key.get_pressed()
                 if keys[K_UP] or keys[K_DOWN] or keys[K_LEFT] or keys[K_RIGHT]:
                     if self.player.rect.colliderect(self.item.rect):
+                        if self.item.kind == "needle":
+                            self.draw_item = "needle"
+                        elif self.item.kind == "ether":
+                            self.draw_item = "ether"
+                        elif self.item.kind == "pipe":
+                            self.draw_item = "pipe"
                         self.items_in_level -= 1
                         self.sound_point.play()
                         self.player.scoring_up()
                         self.items.remove(self.item)
+
 
             pygame.time.wait(50)
             self.draw()
@@ -243,6 +271,7 @@ class Game:
         """
         Fill background and blit everything to the screen
         """
+
         # Item test position
         self.test_item()
 
@@ -271,6 +300,20 @@ class Game:
             SCREEN.blit(self.music.play_img, (SCREEN_W - 35, SCREEN_H - 35))
         else:
             SCREEN.blit(self.music.stop_img, (SCREEN_W - 35, SCREEN_H - 35))
+
+        if self.draw_item == "needle":
+            SCREEN.blit(self.needle_xl_image, (
+                (SCREEN_W // 2 - self.needle_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.needle_xl_rect.y * 2) / 2))
+        elif self.draw_item == "ether":
+            SCREEN.blit(self.ether_xl_image, (
+                (SCREEN_W // 2 - self.ether_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.ether_xl_rect.y * 2) / 2))
+        elif self.draw_item == "pipe":
+            SCREEN.blit(self.pipe_xl_image, (
+                (SCREEN_W // 2 - self.pipe_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.pipe_xl_rect.y * 2) / 2))
+
         pygame.display.flip()
         pygame.display.flip()
         pygame.time.wait(50)

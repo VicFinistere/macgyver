@@ -1,7 +1,7 @@
+#!/usr/bin/env python
 """
 main.py  : This file plays the game
 """
-#! env/bin/python
 import pygame
 from config import TITLE, ICON
 from intro import Intro
@@ -73,36 +73,40 @@ def end(status):
     return status
 
 
-# Game loop
-run = True
-while run:
+if __name__ == "__main__":
+    """
+    Our Python files can act as standalone programs
+    """
+    # Game loop
+    run = True
+    while run:
 
-    # Splash screen
-    play = intro(0)
+        # Splash screen
+        play = intro(0)
 
-    # splash screen returns true => rules scene
-    if play == 1:
-        play = rules(0)
-
-        # if rules scene returns true => game : level 1
+        # splash screen returns true => rules scene
         if play == 1:
-            play = levels(0)
+            play = rules(0)
 
-            # Only one level
-            if play == 0:
-                play = end(0)
+            # if rules scene returns true => game : level 1
+            if play == 1:
+                play = levels(0)
 
-                # Restart( User Event )
-                if play == 1:
-                    run = True
+                # Only one level
+                if play == 0:
+                    play = end(0)
 
-                # Quit ( Close )
-                else:
-                    run = False
+                    # Restart( User Event )
+                    if play == 1:
+                        run = True
 
+                    # Quit ( Close )
+                    else:
+                        run = False
+
+            else:
+                run = False
         else:
             run = False
-    else:
-        run = False
 
-pygame.quit()
+    pygame.quit()

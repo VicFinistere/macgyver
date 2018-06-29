@@ -54,7 +54,6 @@ class End:
                     return self.status
 
                 elif event.type == MOUSEBUTTONDOWN or event.type == KEYDOWN:
-
                     self.status = 1
                     self.run = False
                     return self.status

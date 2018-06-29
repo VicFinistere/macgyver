@@ -1,7 +1,7 @@
 """
 This is the scene where you can figure out how to play with instructions texts and keyboard arrows image
 """
-import pygame as pg
+import pygame
 import os
 from pygame.locals import *
 from config import ASSETS_DIR, SCREEN, COLORS, SCREEN_W, SCREEN_H
@@ -15,8 +15,8 @@ class Rules:
     def __init__(self):
 
         # Text fonts
-        font = pg.font.Font(None, 42)
-        inst_font = pg.font.Font(None, 24)
+        font = pygame.font.Font(None, 42)
+        inst_font = pygame.font.Font(None, 24)
 
         # Texts
         text_content = "Mac Gyver Maze"
@@ -26,14 +26,14 @@ class Rules:
         inst_content4 = "  P = Pause the game / S = Stop the music"
 
         # Sound
-        sound = pg.mixer.Sound(os.path.join(ASSETS_DIR, "sfx/intro.wav"))
+        sound = pygame.mixer.Sound(os.path.join(ASSETS_DIR, "sfx/intro.wav"))
         sound.play()
 
         # Background
-        self.background = pg.image.load(os.path.join(ASSETS_DIR, "gfx/splashscreen.png"))
+        self.background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/splashscreen.png"))
 
         # Arrows ( image for keys comprehension )
-        self.arrows = pg.image.load(os.path.join(ASSETS_DIR, "gfx/arrows.png"))
+        self.arrows = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/arrows.png"))
         self.arrows_rect = self.arrows.get_rect()
 
         # Title element
@@ -61,7 +61,7 @@ class Rules:
         Event loop
         """
         while self.run:
-            for event in pg.event.get():
+            for event in pygame.event.get():
                 if event.type == MOUSEBUTTONDOWN or event.type == KEYDOWN:
                     self.status = 1
                     self.run = False
@@ -72,7 +72,7 @@ class Rules:
                     self.run = False
                     return self.status
 
-            pg.time.wait(500)
+            pygame.time.wait(500)
             self.draw()
 
     def draw(self):
@@ -85,7 +85,7 @@ class Rules:
         # Blit everything to the screen
 
         # Text Background
-        pg.draw.rect(SCREEN, COLORS["SILVER"], (20, 20, SCREEN_W - 40, SCREEN_H - 40))
+        pygame.draw.rect(SCREEN, COLORS["SILVER"], (20, 20, SCREEN_W - 40, SCREEN_H - 40))
 
         # Text elements ordered by position ( from top to bottom )
         SCREEN.blit(self.title, ((SCREEN_W - self.title_rect) / 2, 60))
@@ -99,10 +99,10 @@ class Rules:
         SCREEN.blit(self.arrows, ((SCREEN_W - self.arrows_rect[w] * n), SCREEN_H / 2 - self.arrows_rect[h] / n))
 
         # Display scene
-        pg.display.flip()
+        pygame.display.flip()
 
         # Slow down process
-        pg.time.wait(500)
+        pygame.time.wait(500)
 
         # Update Loop
         # ( seeking for new requests )

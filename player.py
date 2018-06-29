@@ -1,6 +1,6 @@
 import os
 import pygame
-from config import ASSETS_DIR, SCREEN, SCREEN_W, SCREEN_H
+from config import ASSETS_DIR
 
 
 class Player(pygame.sprite.Sprite):
@@ -15,7 +15,6 @@ class Player(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
 
-        self.area = SCREEN.get_rect()
         self.speed = 32
         self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/player.png"))
         self.image = pygame.transform.scale(self.image, (32, 32))

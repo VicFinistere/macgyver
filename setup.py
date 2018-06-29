@@ -1,8 +1,8 @@
 from cx_Freeze import *
 import os
 
-os.environ['TCL_LIBRARY'] = r'C:\Users\zwiim\Documents\macgyver\venv\Lib\tcl8.6'
-os.environ['TK_LIBRARY'] = r'C:\Users\zwiim\Documents\macgyver\venv\Lib\tcl8.6'
+os.environ['TCL_LIBRARY'] = r'.\venv\Lib\tcl8.6'
+os.environ['TK_LIBRARY'] = r'.\venv\Lib\tcl8.6'
 
 base = None
 

@@ -20,6 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (32, 32))
         self.rect = pygame.Rect(pos[0] * 32, pos[1] * 32, 32, 32)
         self.score = "0"
+        self.collides_enemy = False
         self.collecting = False
 
     def move_up(self):

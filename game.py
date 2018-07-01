@@ -49,8 +49,6 @@ class Game:
         # We just want 4 items by level
         self.items_in_level = 3
 
-        self.collide_enemy = False
-
         for row in range(15):
             for col in range(15):
                 # Walls in tmx file
@@ -81,6 +79,9 @@ class Game:
         self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), "pipe")
         self.items.append(self.item)
 
+        # Collecting image feedback status
+        self.draw_item = False
+
         # XL image when player catch sprite
         self.ether_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/ether_xl.png"))
         self.needle_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/needle_xl.png"))
@@ -90,8 +91,6 @@ class Game:
         self.ether_xl_rect = self.ether_xl_image.get_rect()
         self.needle_xl_rect = self.needle_xl_image.get_rect()
         self.pipe_xl_rect = self.pipe_xl_image.get_rect()
-
-        self.draw_item = False
 
         # Create a font
         self.font = pygame.font.Font(None, 24)
@@ -111,8 +110,11 @@ class Game:
         """
         Remake an item when collide to a wall, enemy or player rect
         """
+        # Remove item
         self.items.remove(self.item)
         self.items_in_level -= 1
+
+        # Remake item
         self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), kind)
         self.items.append(self.item)
         self.items_in_level += 1
@@ -135,6 +137,144 @@ class Game:
             if self.item.rect.colliderect(self.player.rect):
                 self.remake_item(self.item.kind)
 
+    def check_items_collecting(self):
+        """
+        Actions when player is collecting items
+        """
+        self.draw_item = False
+        for self.item in self.items:
+
+            keys = pygame.key.get_pressed()
+
+            # Checking user event ( player is moving )
+            if keys[K_UP] or keys[K_DOWN] or keys[K_LEFT] or keys[K_RIGHT]:
+
+                # Player and Items are colliding
+                if self.player.rect.colliderect(self.item.rect):
+
+                    # Needle collecting feedback
+                    if self.item.kind == "needle":
+                        self.draw_item = "needle"
+
+                    # Ether collecting feedback
+                    elif self.item.kind == "ether":
+                        self.draw_item = "ether"
+
+                    # Pipe collecting feedback
+                    elif self.item.kind == "pipe":
+                        self.draw_item = "pipe"
+
+                    # Countdown items
+                    self.items_in_level -= 1
+
+                    # Collecting sound feedback
+                    self.sound_point.play()
+
+                    # Scoring up
+                    self.player.scoring_up()
+
+                    # Remove the item
+                    self.items.remove(self.item)
+
+    def handling_music(self, keys):
+        """
+        Handle the music
+        :param keys: Pressed keys
+        """
+
+        # Music keys
+        if keys[K_p] or keys[K_s]:
+
+            # Pause the music ( playing by default )
+            if self.music.is_playing:
+                self.music.is_playing = False
+                self.music.pause()
+
+                # Pause text : on
+                if keys[K_p]:
+                    self.pause = True
+
+            # Restart the music ( Stop the pause )
+            elif not self.music.is_playing:
+                self.music.is_playing = True
+                self.music.unpause()
+
+                # Pause text : off
+                if keys[K_p]:
+                    self.pause = False
+
+    def walking_in_maze(self, keys):
+        """
+        Player is evolving in the maze
+        :param keys: Pressed keys
+        """
+
+        # Check if the game is paused
+        if not self.pause:
+
+            # up
+            if keys[K_UP]:
+
+                # Check the player position before moves
+                if self.player.rect.y > 0:
+                    self.player.move_up()
+
+                    # Prevent player colliding walls
+                    for self.wall in self.walls:
+                        if self.player.rect.colliderect(self.wall.rect):
+
+                            # Going back
+                            self.player.move_down()
+
+            # down
+            elif keys[K_DOWN]:
+
+                # Check the player position before moves
+                if self.player.rect.y + self.player.speed < SCREEN_H:
+                    self.player.move_down()
+
+                    # Prevent player colliding walls
+                    for self.wall in self.walls:
+                        if self.player.rect.colliderect(self.wall.rect):
+
+                            # Going back
+                            self.player.move_up()
+
+            # right
+            elif keys[K_RIGHT]:
+                # Check the player position before moves
+                if self.player.rect.x + self.player.speed < SCREEN_W:
+                    self.player.move_right()
+
+                    # Prevent player colliding walls
+                    for self.wall in self.walls:
+                        if self.player.rect.colliderect(self.wall.rect):
+
+                            # Going back
+                            self.player.move_left()
+
+            # left
+            elif keys[K_LEFT]:
+                # Check the player position before moves
+                if self.player.rect.x > 0:
+                    self.player.move_left()
+
+                    # Prevent player colliding walls
+                    for self.wall in self.walls:
+                        if self.player.rect.colliderect(self.wall.rect):
+
+                            # Going back
+                            self.player.move_right()
+
+    def checking_player_colliding_enemy(self):
+        """
+        Check if player is colliding with enemy
+        :return: (bool)
+        """
+        if self.player.rect.colliderect(self.enemy.rect):
+            self.player.collides_enemy = True
+            return True
+
     def scoring(self):
         """
         Scoring system
@@ -143,9 +283,26 @@ class Game:
         get_score_value = str(self.player.score)
         return get_score_value
 
+    def check_for_ending(self, event):
+        """
+        Check if the game will be terminated
+        :param: event: Captured events
+        """
+        if self.player.collides_enemy:
+
+            if self.items_in_level == 0:
+                self.win_or_fail("win")
+            else:
+                self.win_or_fail("fail")
+
+        if event.type == QUIT:
+            self.win_or_fail("close")
+
     def win_or_fail(self, ending):
         """
         Those actions differs when game is terminated
+        :param : ending : The ending status of the game
+        :return : status ( always 0 if only one level )
         """
         ending_status = False
         if ending == "win":
@@ -160,12 +317,19 @@ class Game:
             self.sound_fail.play()
             ending_status = "GAME OVER !!"
 
+        # Fading out music
         self.music.fadeout()
+
+        # Writing score in text file
         file = open('score.txt', 'w')
         file.write(ending_status)
         file.close()
-        self.music.fadeout()
+
+        # Exit game loop
         self.run = False
+
+        # Return status
+        # ( in order to pass to the next in the future)
         return self.status
 
     def update(self):
@@ -173,122 +337,26 @@ class Game:
         Event loop
         """
 
+        # Game loop is running
         while self.run:
 
+            # Capture user events
             for event in pygame.event.get():
-
-                if self.collide_enemy:
-
-                    if self.items_in_level == 0:
-                        self.win_or_fail("win")
-
-                    else:
-                        self.win_or_fail("fail")
-
-                if event.type == QUIT:
-                    self.win_or_fail("close")
+                self.check_for_ending(event)
 
                 # Pressing a key
                 keys = pygame.key.get_pressed()
+                self.handling_music(keys)
+                self.walking_in_maze(keys)
+                self.checking_player_colliding_enemy()
 
-                # Music keys
-                if keys[K_p] or keys[K_s]:
+            # Check if player is collecting items
+            self.check_items_collecting()
 
-                    # Pause the music ( playing by default )
-                    if self.music.is_playing:
-                        self.music.is_playing = False
-                        self.music.pause()
-
-                        # Pause text : on
-                        if keys[K_p]:
-                            self.pause = True
-
-                    # Restart the music ( Stop the pause )
-                    elif not self.music.is_playing:
-                        self.music.is_playing = True
-                        self.music.unpause()
-
-                        # Pause text : off
-                        if keys[K_p]:
-                            self.pause = False
-
-                # up
-                if not self.pause:
-                    if keys[K_UP]:
-                        if self.player.rect.y > 0:
-                            self.player.move_up()
-                            for self.wall in self.walls:
-                                if self.player.rect.colliderect(self.wall.rect):
-                                    self.player.move_down()
-
-                    # down
-                    elif keys[K_DOWN]:
-                        if self.player.rect.y + self.player.speed < SCREEN_H:
-                            self.player.move_down()
-                            for self.wall in self.walls:
-                                if self.player.rect.colliderect(self.wall.rect):
-                                    self.player.move_up()
-
-
-                    # right
-                    elif keys[K_RIGHT]:
-                        if self.player.rect.x + self.player.speed < SCREEN_W:
-                            self.player.move_right()
-                            for self.wall in self.walls:
-                                if self.player.rect.colliderect(self.wall.rect):
-                                    self.player.move_left()
-
-
-                    # left
-                    elif keys[K_LEFT]:
-                        if self.player.rect.x > 0:
-                            self.player.move_left()
-                            for self.wall in self.walls:
-                                if self.player.rect.colliderect(self.wall.rect):
-                                    self.player.move_right()
-
-                # Collide with enemy
-                if self.player.rect.colliderect(self.enemy.rect):
-                    self.collide_enemy = True
-
-            # Collect items
-            self.draw_item = False
-            for self.item in self.items:
-
-                keys = pygame.key.get_pressed()
-
-                # Checking user event ( player is moving )
-                if keys[K_UP] or keys[K_DOWN] or keys[K_LEFT] or keys[K_RIGHT]:
-
-                    # Player and Items are colliding
-                    if self.player.rect.colliderect(self.item.rect):
-
-                        # Needle collecting feedback
-                        if self.item.kind == "needle":
-                            self.draw_item = "needle"
-
-                        # Ether collecting feedback
-                        elif self.item.kind == "ether":
-                            self.draw_item = "ether"
-
-                        # Pipe collecting feedback
-                        elif self.item.kind == "pipe":
-                            self.draw_item = "pipe"
-
-                        # Countdown items
-                        self.items_in_level -= 1
-
-                        # Collecting sound feedback
-                        self.sound_point.play()
-
-                        # Scoring up
-                        self.player.scoring_up()
-
-                        # Remove the item
-                        self.items.remove(self.item)
-
-
+            # Prevent too many recursion errors
             pygame.time.wait(50)
+
+            # Draw the updated game
             self.draw()
 
     def draw(self):
@@ -349,7 +417,11 @@ class Game:
                 (SCREEN_W // 2 - self.pipe_xl_rect.x * 2) / 2,
                 (SCREEN_H // 2 - self.pipe_xl_rect.y * 2) / 2))
 
+        # Update the game
         pygame.display.flip()
-        pygame.display.flip()
+
+        # Prevent too many recursion errors
         pygame.time.wait(50)
+
+        # Check for updates
         self.update()

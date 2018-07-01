@@ -4,15 +4,9 @@ Game Scene : This is where all the game logic is made
 import os
 import pygame
 from pygame.locals import *
-import pytmx
-from config import COLORS, SCREEN, SCREEN_W, SCREEN_H
+from config import ASSETS_DIR, COLORS, SCREEN, SCREEN_W, SCREEN_H
 from music import Music
-from player import Player
-from enemy import Enemy
-from item import Item
-from wall import Wall
-from config import ASSETS_DIR
-from random import randint
+from level import Level
 
 
 class Game:
@@ -30,57 +24,39 @@ class Game:
         # Font
         font = pygame.font.Font(None, 24)
 
-        # Texts
+        # Pause text
         pause_content = " (P)ause "
 
         # Pygame Texts Elements
         self.text = font.render(pause_content, 1, (COLORS["WHITE"]))
         self.text_rect = (font.size(pause_content))[0]
 
-        # Level
-        level_file = os.path.join(ASSETS_DIR, "gfx", "level.tmx")
-        level = pytmx.load_pygame(level_file)
-        self.walls = []
-        self.items = []
-        wall_tiles = 0
-        enemy_tiles = 2
-        player_tiles = 3
+        # Create the level
+        self.level = Level()
 
-        # We just want 4 items by level
-        self.items_in_level = 3
+        # Player
+        self.player = self.level.player
 
-        for row in range(15):
-            for col in range(15):
-                # Walls in tmx file
-                wall = level.get_tile_image(row, col, wall_tiles)
-                if wall is not None:
-                    self.wall = Wall((row, col))
-                    self.walls.append(self.wall)
+        # Enemy
+        self.enemy = self.level.enemy
 
-                # Enemy in tmx file
-                enemy = level.get_tile_image(row, col, enemy_tiles)
-                if enemy is not None:
-                    self.enemy = Enemy((row, col))
+        # Walls
+        self.walls = self.level.walls
 
-                # Player in tmx file
-                player = level.get_tile_image(row, col, player_tiles)
-                if player is not None:
-                    self.player = Player((row, col))
+        # Wall
+        self.wall = self.level.wall
 
-        # Ether item
-        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), "ether")
-        self.items.append(self.item)
+        # Items
+        self.items = self.level.items
 
-        # Needle item
-        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), "needle")
-        self.items.append(self.item)
+        # Item
+        self.item = self.level.item
 
-        # Pipe
-        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), "pipe")
-        self.items.append(self.item)
+        # Item counter
+        self.items_in_level = self.level.items_in_level
 
         # Item test position
-        self.test_item()
+        self.level.test_item()
 
         # Collecting image feedback status
         self.draw_item = False
@@ -121,40 +97,6 @@ class Game:
         for self.item in self.items:
             if self.item.rect:
                 SCREEN.blit(self.item.image, (self.item.rect.x, self.item.rect.y))
-
-    def test_item(self):
-        """
-        Test of the random generation ( goal :  be able to catch it )
-        """
-        # Test items generation with walls
-        for self.item in self.items:
-            for self.wall in self.walls:
-                if self.item.rect.colliderect(self.wall.rect):
-                    self.remake_item(self.item.kind)
-
-            # Test item generation with enemy
-            if self.item.rect.colliderect(self.enemy.rect):
-                self.remake_item(self.item.kind)
-
-            # Test item generation with player
-            if self.item.rect.colliderect(self.player.rect):
-                self.remake_item(self.item.kind)
-
-    def remake_item(self, kind):
-        """
-        Remake an item when collide to a wall, enemy or player rect
-        """
-        # Remove item
-        self.items.remove(self.item)
-        self.items_in_level -= 1
-
-        # Remake item
-        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), kind)
-        self.items.append(self.item)
-        self.items_in_level += 1
-
-        # Item test position
-        self.test_item()
 
     def check_items_collecting(self):
         """

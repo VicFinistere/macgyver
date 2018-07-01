@@ -43,14 +43,8 @@ class Game:
         # Walls
         self.walls = self.level.walls
 
-        # Wall
-        self.wall = self.level.wall
-
         # Items
         self.items = self.level.items
-
-        # Item
-        self.item = self.level.item
 
         # Item counter
         self.items_in_level = self.level.items_in_level

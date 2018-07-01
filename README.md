@@ -11,10 +11,16 @@ Zoé Belleton zoebelleton@gmail.com @zoeinfp
 
 OpenClassrooms python application developper path 
 
-## Build
-
-You will need to get all requirements and then launch "build.bat" to get your executable
-
 ## License
 
 Mozilla Public Licence
+
+## Build
+ In order to get an executable of the game you will need to : 
+
+    - Get all requirements and then launch the "build.bat" file.
+
+    - Check for tcl86t.dll & tk86t.dll in tcl and tk directories.
+    
+    - Move the assets directory and all the root python files to make the game works.
+  

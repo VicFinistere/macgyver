@@ -15,10 +15,18 @@ class Item(pygame.sprite.Sprite):
 
     def __init__(self, pos, kind):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx", kind+".png"))
+
+        # Get the kind of the item is created
         self.kind = kind
-        # self.image = pygame.transform.scale(self.image, (30, 30))
+
+        # Initialize the item
+        self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx", kind+".png"))
         self.rect = pygame.Rect(pos[0], pos[1], 30, 30)
+
+        # Change the orientation randomly
+        self.random_orientation()
+
+    def random_orientation(self):
         random_orientation = randint(0, 3)
         if random_orientation == 0:
             self.image = pygame.transform.rotate(self.image, 90)

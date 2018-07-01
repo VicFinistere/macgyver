@@ -79,6 +79,9 @@ class Game:
         self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), "pipe")
         self.items.append(self.item)
 
+        # Item test position
+        self.test_item()
+
         # Collecting image feedback status
         self.draw_item = False
 
@@ -106,18 +109,18 @@ class Game:
         self.status = 0
         self.draw()
 
-    def remake_item(self, kind):
+    def draw_level(self):
         """
-        Remake an item when collide to a wall, enemy or player rect
+        Draw level
         """
-        # Remove item
-        self.items.remove(self.item)
-        self.items_in_level -= 1
+        # Draw walls
+        for self.wall in self.walls:
+            SCREEN.blit(self.wall.image, (self.wall.rect.x, self.wall.rect.y))
 
-        # Remake item
-        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), kind)
-        self.items.append(self.item)
-        self.items_in_level += 1
+        # Draw items
+        for self.item in self.items:
+            if self.item.rect:
+                SCREEN.blit(self.item.image, (self.item.rect.x, self.item.rect.y))
 
     def test_item(self):
         """
@@ -136,6 +139,22 @@ class Game:
             # Test item generation with player
             if self.item.rect.colliderect(self.player.rect):
                 self.remake_item(self.item.kind)
+
+    def remake_item(self, kind):
+        """
+        Remake an item when collide to a wall, enemy or player rect
+        """
+        # Remove item
+        self.items.remove(self.item)
+        self.items_in_level -= 1
+
+        # Remake item
+        self.item = Item((randint(64, SCREEN_W - 64), randint(64, SCREEN_H - 64)), kind)
+        self.items.append(self.item)
+        self.items_in_level += 1
+
+        # Item test position
+        self.test_item()
 
     def check_items_collecting(self):
         """
@@ -176,9 +195,9 @@ class Game:
                     # Remove the item
                     self.items.remove(self.item)
 
-    def handling_music(self, keys):
+    def pause_and_music(self, keys):
         """
-        Handle the music
+        Handle the pause and the music
         :param keys: Pressed keys
         """
 
@@ -203,6 +222,15 @@ class Game:
                 if keys[K_p]:
                     self.pause = False
 
+    def draw_music_status(self):
+        """
+        Draw music status image
+        """
+        if self.music.is_playing:
+            SCREEN.blit(self.music.play_img, (SCREEN_W - 35, SCREEN_H - 35))
+        else:
+            SCREEN.blit(self.music.stop_img, (SCREEN_W - 35, SCREEN_H - 35))
+
     def walking_in_maze(self, keys):
         """
         Player is evolving in the maze
@@ -222,7 +250,6 @@ class Game:
                     # Prevent player colliding walls
                     for self.wall in self.walls:
                         if self.player.rect.colliderect(self.wall.rect):
-
                             # Going back
                             self.player.move_down()
 
@@ -236,7 +263,6 @@ class Game:
                     # Prevent player colliding walls
                     for self.wall in self.walls:
                         if self.player.rect.colliderect(self.wall.rect):
-
                             # Going back
                             self.player.move_up()
 
@@ -249,7 +275,6 @@ class Game:
                     # Prevent player colliding walls
                     for self.wall in self.walls:
                         if self.player.rect.colliderect(self.wall.rect):
-
                             # Going back
                             self.player.move_left()
 
@@ -262,7 +287,6 @@ class Game:
                     # Prevent player colliding walls
                     for self.wall in self.walls:
                         if self.player.rect.colliderect(self.wall.rect):
-
                             # Going back
                             self.player.move_right()
 
@@ -274,6 +298,30 @@ class Game:
         if self.player.rect.colliderect(self.enemy.rect):
             self.player.collides_enemy = True
             return True
+
+    def draw_score(self):
+        # Draw score
+        score_value = self.scoring()
+        score = self.font.render(score_value, 1, (COLORS["WHITE"]))
+        score_rect = (self.font.size(score_value))[0]
+        SCREEN.blit(score, ((SCREEN_W - score_rect) - 20, 20))
+
+    def draw_collided_item(self):
+        """
+        Draw collided items image
+        """
+        if self.draw_item == "needle":
+            SCREEN.blit(self.needle_xl_image, (
+                (SCREEN_W // 2 - self.needle_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.needle_xl_rect.y * 2) / 2))
+        elif self.draw_item == "ether":
+            SCREEN.blit(self.ether_xl_image, (
+                (SCREEN_W // 2 - self.ether_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.ether_xl_rect.y * 2) / 2))
+        elif self.draw_item == "pipe":
+            SCREEN.blit(self.pipe_xl_image, (
+                (SCREEN_W // 2 - self.pipe_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.pipe_xl_rect.y * 2) / 2))
 
     def scoring(self):
         """
@@ -346,7 +394,7 @@ class Game:
 
                 # Pressing a key
                 keys = pygame.key.get_pressed()
-                self.handling_music(keys)
+                self.pause_and_music(keys)
                 self.walking_in_maze(keys)
                 self.checking_player_colliding_enemy()
 
@@ -364,31 +412,15 @@ class Game:
         Fill background and blit everything to the screen
         """
 
-        # Item test position
-        self.test_item()
-
-        score_value = self.scoring()
-        score = self.font.render(score_value, 1, (COLORS["WHITE"]))
-        score_rect = (self.font.size(score_value))[0]
-
         # Fill background
         background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/background.png"))
         SCREEN.blit(background, (0, 0))
 
-        # Draw walls
-        for self.wall in self.walls:
-            SCREEN.blit(self.wall.image, (self.wall.rect.x, self.wall.rect.y))
-
-        # Draw items
-        for self.item in self.items:
-            if self.item.rect:
-                SCREEN.blit(self.item.image, (self.item.rect.x, self.item.rect.y))
+        # Draw level
+        self.draw_level()
 
         # Draw music sign
-        if self.music.is_playing:
-            SCREEN.blit(self.music.play_img, (SCREEN_W - 35, SCREEN_H - 35))
-        else:
-            SCREEN.blit(self.music.stop_img, (SCREEN_W - 35, SCREEN_H - 35))
+        self.draw_music_status()
 
         # Draw enemy
         SCREEN.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
@@ -397,25 +429,14 @@ class Game:
         SCREEN.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
 
         # Draw score
-        SCREEN.blit(score, ((SCREEN_W - score_rect) - 20, 20))
+        self.draw_score()
 
         # Draw text pause
         if self.pause:
             SCREEN.blit(self.text, ((SCREEN_W / 2) - (self.text_rect / 2), SCREEN_H / 2))
 
-        # Draw items colling feedback
-        if self.draw_item == "needle":
-            SCREEN.blit(self.needle_xl_image, (
-                (SCREEN_W // 2 - self.needle_xl_rect.x * 2) / 2,
-                (SCREEN_H // 2 - self.needle_xl_rect.y * 2) / 2))
-        elif self.draw_item == "ether":
-            SCREEN.blit(self.ether_xl_image, (
-                (SCREEN_W // 2 - self.ether_xl_rect.x * 2) / 2,
-                (SCREEN_H // 2 - self.ether_xl_rect.y * 2) / 2))
-        elif self.draw_item == "pipe":
-            SCREEN.blit(self.pipe_xl_image, (
-                (SCREEN_W // 2 - self.pipe_xl_rect.x * 2) / 2,
-                (SCREEN_H // 2 - self.pipe_xl_rect.y * 2) / 2))
+        # Draw collided items feedback
+        self.draw_collided_item()
 
         # Update the game
         pygame.display.flip()

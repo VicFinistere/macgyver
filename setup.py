@@ -1,8 +1,9 @@
 from cx_Freeze import *
 import os
 
-os.environ['TCL_LIBRARY'] = r'.\venv\Lib\tcl8.6'
-os.environ['TK_LIBRARY'] = r'.\venv\Lib\tcl8.6'
+# Please check for tcl86t.dll & tk86t.dll in tcl and tk dir
+os.environ['TCL_LIBRARY'] = r'.\venv\Script\tcl86t'
+os.environ['TK_LIBRARY'] = r'.\venv\Script\tk86t'
 
 base = None
 

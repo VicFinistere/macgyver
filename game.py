@@ -143,6 +143,31 @@ class Game:
         get_score_value = str(self.player.score)
         return get_score_value
 
+    def win_or_fail(self, ending):
+        """
+        Those actions differs when game is terminated
+        """
+        ending_status = False
+        if ending == "win":
+            self.sound_win.play()
+            ending_status = "Victory ! You made the guard falling asleep !"
+
+        elif ending == "close":
+            self.sound_fail.play()
+            ending_status = "You close before facing your enemy! Game Over..."
+
+        elif ending == "fail":
+            self.sound_fail.play()
+            ending_status = "GAME OVER !!"
+
+        self.music.fadeout()
+        file = open('score.txt', 'w')
+        file.write(ending_status)
+        file.close()
+        self.music.fadeout()
+        self.run = False
+        return self.status
+
     def update(self):
         """
         Event loop
@@ -155,35 +180,15 @@ class Game:
                 if self.collide_enemy:
 
                     if self.items_in_level == 0:
-                        self.sound_win.play()
-                        file = open('score.txt', 'w')
-                        file.write(f"Victory ! You made the guard falling asleep !")
-                        file.close()
-                        self.status = 0
-                        self.run = False
-                        return self.status
+                        self.win_or_fail("win")
 
                     else:
-                        self.sound_fail.play()
-                        file = open('score.txt', 'w')
-                        file.write("GAME OVER !!")
-                        file.close()
-                        self.music.fadeout()
-                        self.status = 0
-                        self.run = False
-                        return self.status
+                        self.win_or_fail("fail")
 
                 if event.type == QUIT:
-                    self.sound_fail.play()
-                    file = open('score.txt', 'w')
-                    file.write("You close before facing your enemy! Game Over...")
-                    file.close()
-                    self.music.fadeout()
-                    self.status = 0
-                    self.run = False
-                    return self.status
-                    # Pressing a key
+                    self.win_or_fail("close")
 
+                # Pressing a key
                 keys = pygame.key.get_pressed()
 
                 # Music keys
@@ -249,18 +254,37 @@ class Game:
             # Collect items
             self.draw_item = False
             for self.item in self.items:
+
                 keys = pygame.key.get_pressed()
+
+                # Checking user event ( player is moving )
                 if keys[K_UP] or keys[K_DOWN] or keys[K_LEFT] or keys[K_RIGHT]:
+
+                    # Player and Items are colliding
                     if self.player.rect.colliderect(self.item.rect):
+
+                        # Needle collecting feedback
                         if self.item.kind == "needle":
                             self.draw_item = "needle"
+
+                        # Ether collecting feedback
                         elif self.item.kind == "ether":
                             self.draw_item = "ether"
+
+                        # Pipe collecting feedback
                         elif self.item.kind == "pipe":
                             self.draw_item = "pipe"
+
+                        # Countdown items
                         self.items_in_level -= 1
+
+                        # Collecting sound feedback
                         self.sound_point.play()
+
+                        # Scoring up
                         self.player.scoring_up()
+
+                        # Remove the item
                         self.items.remove(self.item)
 
 
@@ -283,24 +307,35 @@ class Game:
         background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/background.png"))
         SCREEN.blit(background, (0, 0))
 
-        # Blit everything to the screen
-        SCREEN.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
-        SCREEN.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
-        if self.pause:
-            SCREEN.blit(self.text, ((SCREEN_W / 2) - (self.text_rect / 2), SCREEN_H / 2))
-
+        # Draw walls
         for self.wall in self.walls:
             SCREEN.blit(self.wall.image, (self.wall.rect.x, self.wall.rect.y))
 
+        # Draw items
         for self.item in self.items:
             if self.item.rect:
                 SCREEN.blit(self.item.image, (self.item.rect.x, self.item.rect.y))
-        SCREEN.blit(score, ((SCREEN_W - score_rect) - 20, 20))
+
+        # Draw music sign
         if self.music.is_playing:
             SCREEN.blit(self.music.play_img, (SCREEN_W - 35, SCREEN_H - 35))
         else:
             SCREEN.blit(self.music.stop_img, (SCREEN_W - 35, SCREEN_H - 35))
 
+        # Draw enemy
+        SCREEN.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
+
+        # Draw player
+        SCREEN.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
+
+        # Draw score
+        SCREEN.blit(score, ((SCREEN_W - score_rect) - 20, 20))
+
+        # Draw text pause
+        if self.pause:
+            SCREEN.blit(self.text, ((SCREEN_W / 2) - (self.text_rect / 2), SCREEN_H / 2))
+
+        # Draw items colling feedback
         if self.draw_item == "needle":
             SCREEN.blit(self.needle_xl_image, (
                 (SCREEN_W // 2 - self.needle_xl_rect.x * 2) / 2,

@@ -47,7 +47,7 @@ def rules(status):
     return status
 
 
-def levels(status):
+def level(status):
     """
     Game Levels
     :param status: (bool) Ready to capture User Event
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
             # if rules scene returns true => game : level 1
             if play == 1:
-                play = levels(0)
+                play = level(0)
 
                 # Only one level
                 if play == 0:

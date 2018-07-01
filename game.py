@@ -218,7 +218,7 @@ class Game:
 
                     # down
                     elif keys[K_DOWN]:
-                        if self.player.rect.y + self.player.speed * 2 < SCREEN_H:
+                        if self.player.rect.y + self.player.speed < SCREEN_H:
                             self.player.move_down()
                             for self.wall in self.walls:
                                 if self.player.rect.colliderect(self.wall.rect):
@@ -227,7 +227,7 @@ class Game:
 
                     # right
                     elif keys[K_RIGHT]:
-                        if self.player.rect.x + self.player.speed * 2 < SCREEN_W:
+                        if self.player.rect.x + self.player.speed < SCREEN_W:
                             self.player.move_right()
                             for self.wall in self.walls:
                                 if self.player.rect.colliderect(self.wall.rect):

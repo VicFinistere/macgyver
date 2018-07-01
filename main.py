@@ -51,9 +51,7 @@ def level(status):
     """
     Game Levels
     :param status: (bool) Ready to capture User Event
-    :param level_id: (int) for incrementing when passing to another level
-    :param music_status: (str) An str working like a bool for music handling between levels
-    :return: Updated Status Param + Music Status ( on / off )
+    :return: status : ( to get to the next level in future )
     """
     current = Game()
     if current.status:

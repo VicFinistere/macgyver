@@ -46,6 +46,9 @@ class Game:
         # Items
         self.items = self.level.items
 
+        # Item
+        self.item = self.level.item
+
         # Item counter
         self.items_in_level = self.level.items_in_level
 
@@ -54,16 +57,6 @@ class Game:
 
         # Collecting image feedback status
         self.draw_item = False
-
-        # XL image when player catch sprite
-        self.ether_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/ether_xl.png"))
-        self.needle_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/needle_xl.png"))
-        self.pipe_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/pipe_xl.png"))
-
-        # XL rect for centering display
-        self.ether_xl_rect = self.ether_xl_image.get_rect()
-        self.needle_xl_rect = self.needle_xl_image.get_rect()
-        self.pipe_xl_rect = self.pipe_xl_image.get_rect()
 
         # Create a font
         self.font = pygame.font.Font(None, 24)
@@ -247,17 +240,17 @@ class Game:
         Draw collided items image
         """
         if self.draw_item == "needle":
-            SCREEN.blit(self.needle_xl_image, (
-                (SCREEN_W // 2 - self.needle_xl_rect.x * 2) / 2,
-                (SCREEN_H // 2 - self.needle_xl_rect.y * 2) / 2))
+            SCREEN.blit(self.item.needle_xl_image, (
+                (SCREEN_W // 2 - self.item.needle_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.item.needle_xl_rect.y * 2) / 2))
         elif self.draw_item == "ether":
-            SCREEN.blit(self.ether_xl_image, (
-                (SCREEN_W // 2 - self.ether_xl_rect.x * 2) / 2,
-                (SCREEN_H // 2 - self.ether_xl_rect.y * 2) / 2))
+            SCREEN.blit(self.item.ether_xl_image, (
+                (SCREEN_W // 2 - self.item.ether_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.item.ether_xl_rect.y * 2) / 2))
         elif self.draw_item == "pipe":
-            SCREEN.blit(self.pipe_xl_image, (
-                (SCREEN_W // 2 - self.pipe_xl_rect.x * 2) / 2,
-                (SCREEN_H // 2 - self.pipe_xl_rect.y * 2) / 2))
+            SCREEN.blit(self.item.pipe_xl_image, (
+                (SCREEN_W // 2 - self.item.pipe_xl_rect.x * 2) / 2,
+                (SCREEN_H // 2 - self.item.pipe_xl_rect.y * 2) / 2))
 
     def scoring(self):
         """

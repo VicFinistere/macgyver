@@ -23,6 +23,16 @@ class Item(pygame.sprite.Sprite):
         self.image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx", kind+".png"))
         self.rect = pygame.Rect(pos[0], pos[1], 30, 30)
 
+        # XL image when player catch sprite
+        self.ether_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/ether_xl.png"))
+        self.needle_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/needle_xl.png"))
+        self.pipe_xl_image = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/pipe_xl.png"))
+
+        # XL rect for centering display
+        self.ether_xl_rect = self.ether_xl_image.get_rect()
+        self.needle_xl_rect = self.needle_xl_image.get_rect()
+        self.pipe_xl_rect = self.pipe_xl_image.get_rect()
+
         # Change the orientation randomly
         self.random_orientation()
 

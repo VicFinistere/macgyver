@@ -11,7 +11,7 @@ from config import ASSETS_DIR, SCREEN_W, SCREEN_H
 from random import randint
 
 
-class Level():
+class Level:
     """
     Class Level
     """

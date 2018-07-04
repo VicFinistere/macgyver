@@ -124,7 +124,7 @@ class Game:
                     # Remove the item
                     self.items.remove(self.item)
 
-    def pause_and_music(self, keys):
+    def handle_music(self, keys):
         """
         Handle the pause and the music
         :param keys: Pressed keys
@@ -138,18 +138,26 @@ class Game:
                 self.music.is_playing = False
                 self.music.pause()
 
-                # Pause text : on
-                if keys[K_p]:
-                    self.pause = True
-
             # Restart the music ( Stop the pause )
             elif not self.music.is_playing:
                 self.music.is_playing = True
                 self.music.unpause()
 
-                # Pause text : off
-                if keys[K_p]:
-                    self.pause = False
+    def handle_pause(self, keys):
+        """
+        Handle the pause
+        :param keys: Pressed keys
+        """
+        # Pause key
+        if keys[K_p]:
+
+            # Pause the game
+            if self.pause:
+                self.pause = False
+
+            # Restart the game
+            else:
+                self.pause = True
 
     def draw_music_status(self):
         """
@@ -323,7 +331,8 @@ class Game:
 
                 # Pressing a key
                 keys = pygame.key.get_pressed()
-                self.pause_and_music(keys)
+                self.handle_pause(keys)
+                self.handle_music(keys)
                 self.walking_in_maze(keys)
                 self.checking_player_colliding_enemy()
 

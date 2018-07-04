@@ -351,8 +351,7 @@ class Game:
         """
 
         # Fill background
-        background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/background.png"))
-        SCREEN.blit(background, (0, 0))
+        SCREEN.blit(self.level.background, (0, 0))
 
         # Draw level
         self.draw_level()

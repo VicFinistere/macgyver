@@ -3,6 +3,7 @@ This class makes the level
 """
 import os
 import pytmx
+import pygame
 from player import Player
 from enemy import Enemy
 from wall import Wall
@@ -17,6 +18,7 @@ class Level:
     """
 
     def __init__(self):
+        self.background = pygame.image.load(os.path.join(ASSETS_DIR, "gfx/background.png"))
         level_file = os.path.join(ASSETS_DIR, "gfx", "level.tmx")
         level = pytmx.load_pygame(level_file)
         self.walls = []
